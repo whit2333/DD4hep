@@ -104,7 +104,7 @@ class DD4hepSimulation(object):
     self._argv = None
 
     # use TCSH geant UI instead of QT
-    os.environ['G4UI_USE_TCSH'] = "1"
+    #os.environ['G4UI_USE_TCSH'] = "1"
 
   def readSteeringFile(self):
     """Reads a steering file and sets the parameters to that of the
