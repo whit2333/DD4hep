@@ -122,6 +122,14 @@ import_namespace_item('tools', 'Evaluator')
 # ---------------------------------------------------------------------------
 import_namespace_item('core', 'NamedObject')
 import_namespace_item('core', 'run_interpreter')
+#
+import_namespace_item('detail', 'interp')
+import_namespace_item('detail', 'eval')
+# ---------------------------------------------------------------------------
+# def run_interpreter(name):   detail.interp.run(name)
+# def evaluator():     return eval.instance()
+# def g4Evaluator():   return eval.g4instance()
+# ---------------------------------------------------------------------------
 
 
 def import_detail():

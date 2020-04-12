@@ -21,6 +21,7 @@ for i in "$@" ; do
 done
 
 echo " #### LD_LIBRARY_PATH = :  ${LD_LIBRARY_PATH}"
+echo " #### DYLD_LIBRARY_PATH = :  ${DYLD_LIBRARY_PATH}"
 
 echo " ### running test :  '${command} ${theargs}'"
 exec ${command} ${theargs}

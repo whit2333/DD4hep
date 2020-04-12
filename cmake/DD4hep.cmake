@@ -37,13 +37,7 @@ endif()
 
 function( add_dd4hep_plugin libraryName )
   ADD_LIBRARY ( ${libraryName}  ${ARGN} )
-
-  if(APPLE)
-    dd4hep_generate_rootmap_apple( ${libraryName} )
-  else()
-    dd4hep_generate_rootmap( ${libraryName} )
-  endif()
-
+  dd4hep_generate_rootmap( ${libraryName} )
   install( TARGETS ${libraryName} LIBRARY DESTINATION lib )
 endfunction()
 
@@ -75,28 +69,23 @@ endfunction()
 # Create the .components file needed by the plug-in system.
 #---------------------------------------------------------------------------------------------------
 function(dd4hep_generate_rootmap library)
+
   if(APPLE)
-    dd4hep_generate_rootmap_apple( ${library} )
+    set(ENV_VAR DYLD_LIBRARY_PATH)
+    set(${ENV_VAR}_VALUE $<TARGET_FILE_DIR:${library}>:$<TARGET_FILE_DIR:DD4hep::DD4hepGaudiPluginMgr>)
   else()
-    dd4hep_generate_rootmap_notapple( ${library} )
+    set(ENV_VAR LD_LIBRARY_PATH)
+    set(${ENV_VAR}_VALUE $<TARGET_FILE_DIR:${library}>:$<TARGET_FILE_DIR:DD4hep::DD4hepGaudiPluginMgr>:$ENV{${ENV_VAR}})
   endif()
-endfunction()
-#---------------------------------------------------------------------------------------------------
-function(dd4hep_generate_rootmap_notapple library)
-  if ( NOT DD4hep_DIR )
-    SET ( DD4hep_DIR ${CMAKE_SOURCE_DIR} )
-  endif()
+
   set(rootmapfile ${CMAKE_SHARED_MODULE_PREFIX}${library}.components)
 
   add_custom_command(OUTPUT ${rootmapfile}
                      DEPENDS ${library}
-                     POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -Dlibname=$<TARGET_FILE_NAME:${library}> -Drootmapfile=${rootmapfile}
-                             -DDD4HEP_LISTCOMPONENTS_CMD=$<TARGET_FILE:DD4hep::listcomponents>
-                             -DLIBRARY_LOCATION=$<TARGET_FILE_DIR:${library}>
-                             -DDD4HEP_LIBRARY_LOCATION=$<TARGET_FILE_DIR:DD4hep::DDCore>
-                             -DDD4hep_DIR=${DD4hep_DIR}
-                             -P ${DD4hep_DIR}/cmake/MakeGaudiMap.cmake)
+                     COMMAND ${ENV_VAR}=${${ENV_VAR}_VALUE} $<TARGET_FILE:DD4hep::listcomponents> -o ${rootmapfile} $<TARGET_FILE_NAME:${library}>
+                     WORKING_DIRECTORY ${LIBRARY_OUTPUT_PATH}
+                     )
+
   add_custom_target(Components_${library} ALL DEPENDS ${rootmapfile})
   SET( install_destination "lib" )
   if( CMAKE_INSTALL_LIBDIR )
@@ -105,11 +94,4 @@ function(dd4hep_generate_rootmap_notapple library)
   install(FILES $<TARGET_FILE_DIR:${library}>/${rootmapfile}
     DESTINATION ${install_destination}
   )
-endfunction()
-#
-#
-#---------------------------------------------------------------------------------------------------
-function(dd4hep_generate_rootmap_apple library)
-  # for now do the same for apple that is done for the rest
-  dd4hep_generate_rootmap_notapple( ${library} )
 endfunction()

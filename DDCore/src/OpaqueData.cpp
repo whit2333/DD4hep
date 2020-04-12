@@ -66,7 +66,13 @@ OpaqueDataBlock::OpaqueDataBlock(const OpaqueDataBlock& c)
   grammar = 0;
   pointer = 0;
   this->bind(c.grammar);
-  this->grammar->copy(pointer,c.pointer);
+  if ( this->grammar->specialization.copy )  {
+    this->grammar->specialization.copy(pointer, c.pointer);
+  }
+  else  {
+    except("OpaqueDataBlock","Grammar type %s does not support object copy. Operation not allowed.",
+	   this->grammar->type_name().c_str());
+  }
   InstanceCount::increment(this);
 }
 
@@ -97,8 +103,12 @@ OpaqueDataBlock& OpaqueDataBlock::operator=(const OpaqueDataBlock& c)   {
       type = c.type;
       grammar = 0;
       if ( c.grammar )   {
+	if ( !c.grammar->specialization.copy )  {
+	  except("OpaqueDataBlock","Grammar type %s does not support object copy. Operation not allowed.",
+		 c.grammar->type_name().c_str());
+	}
         bind(c.grammar);
-        grammar->copy(pointer,c.pointer);
+        grammar->specialization.copy(pointer,c.pointer);
         return *this;
       }
       else if ( (c.type&EXTERN_DATA) == EXTERN_DATA )   {
@@ -133,6 +143,18 @@ void* OpaqueDataBlock::bind(const BasicGrammar* g)   {
   return 0;
 }
 
+/// Bind external data value to the pointer
+void OpaqueDataBlock::bindExtern(void* ptr, const BasicGrammar* gr)    {
+  if ( grammar != 0 && type != EXTERN_DATA )  {
+    // We cannot ingore secondary requests for data bindings.
+    // This leads to memory leaks in the caller!
+    except("OpaqueData","You may not bind opaque data multiple times!");
+  }
+  pointer = ptr;
+  grammar = gr;
+  type    = EXTERN_DATA;
+}
+
 /// Set data value
 void* OpaqueDataBlock::bind(void* ptr, size_t size, const BasicGrammar* g)   {
   if ( (type&EXTERN_DATA) == EXTERN_DATA )  {
@@ -159,5 +181,4 @@ void* OpaqueDataBlock::bind(void* ptr, size_t size, const BasicGrammar* g)   {
 }
 
 #include "DD4hep/detail/Grammar_unparsed.h"
-// Ensure the grammars are registered and instantiated
-static auto s_registry = GrammarRegistry::pre_note<OpaqueDataBlock>();
+static auto s_registry = GrammarRegistry::pre_note<OpaqueDataBlock>(1);
