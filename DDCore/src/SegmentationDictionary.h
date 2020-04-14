@@ -40,6 +40,7 @@
 #include "DDSegmentation/PolarGridRPhi2.h"
 #include "DDSegmentation/PolarGridRPhi.h"
 #include "DDSegmentation/ProjectiveCylinder.h"
+#include "DDSegmentation/StereoStrip.h"
 
 #include "DDSegmentation/SegmentationParameter.h"
 #include "DDSegmentation/TiledLayerGridXY.h"
@@ -89,6 +90,7 @@ typedef dd4hep::DDSegmentation::CellID CellID;
 #pragma link C++ class dd4hep::DDSegmentation::TiledLayerGridXY+;
 #pragma link C++ class dd4hep::DDSegmentation::TiledLayerSegmentation+;
 #pragma link C++ class dd4hep::DDSegmentation::WaferGridXY+;
+#pragma link C++ class dd4hep::DDSegmentation::StereoStrip+;
 
 #pragma link C++ class dd4hep::DDSegmentation::BitFieldElement+;
 #pragma link C++ class dd4hep::DDSegmentation::BitFieldCoder+;

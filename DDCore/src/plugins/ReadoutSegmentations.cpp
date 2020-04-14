@@ -75,3 +75,6 @@ DECLARE_SEGMENTATION(ProjectiveCylinder,create_segmentation<dd4hep::DDSegmentati
 
 #include "DDSegmentation/MultiSegmentation.h"
 DECLARE_SEGMENTATION(MultiSegmentation,create_segmentation<dd4hep::DDSegmentation::MultiSegmentation>)
+
+#include "DDSegmentation/StereoStrip.h"
+DECLARE_SEGMENTATION(StereoStrip,create_segmentation<dd4hep::DDSegmentation::StereoStrip>)
